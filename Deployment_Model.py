@@ -6,7 +6,7 @@ from tensorflow.keras.models import load_model
 # ---------------------------------
 # Load CNN Model (Keras)
 # ---------------------------------
-model = load_model("sklearn_digits_cnn.h5")
+model = load_model("mnist_cnn.keras")
 
 # Canvas size
 WIDTH, HEIGHT = 250, 250
@@ -22,6 +22,7 @@ canvas.pack()
 image = Image.new("L", (WIDTH, HEIGHT), 255)
 draw = ImageDraw.Draw(image)
 
+
 # ---------------------------------
 # Draw on canvas
 # ---------------------------------
@@ -31,35 +32,29 @@ def paint(event):
     canvas.create_oval(x1, y1, x2, y2, fill="black", outline="black")
     draw.ellipse([x1, y1, x2, y2], fill=0)
 
+
 def clear():
     canvas.delete("all")
     draw.rectangle([0, 0, WIDTH, HEIGHT], fill=255)
     result_label.config(text="Draw a digit")
 
+
 # ---------------------------------
 # Predict using CNN
 # ---------------------------------
 def predict():
-    # Resize to 8x8 (sklearn digits size)
-    img = image.resize((8, 8))
-
-    # Convert to numpy
+    img = image.resize((28, 28))
     img_arr = np.array(img)
 
-    # Invert colors (black bg, white digit)
     img_arr = 255 - img_arr
-
-    # Normalize (0–1)
     img_arr = img_arr / 255.0
+    img_arr = img_arr.reshape(1, 28, 28, 1)
 
-    # Reshape for CNN: (1, 8, 8, 1)
-    img_arr = img_arr.reshape(1, 8, 8, 1)
-
-    # Predict
     prediction = model.predict(img_arr)
     digit = np.argmax(prediction)
 
     result_label.config(text=f"Predicted Digit: {digit}")
+
 
 # ---------------------------------
 # Bind mouse & buttons
