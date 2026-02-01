@@ -2,6 +2,7 @@ import tkinter as tk
 import numpy as np
 from PIL import Image, ImageDraw
 from tensorflow.keras.models import load_model
+import PIL.ImageOps
 
 # ---------------------------------
 # Load CNN Model (Keras)
@@ -42,18 +43,46 @@ def clear():
 # ---------------------------------
 # Predict using CNN
 # ---------------------------------
+
+
 def predict():
-    img = image.resize((28, 28))
-    img_arr = np.array(img)
+    # 1. Get the bounding box of the drawn digit (ignore whitespace)
+    # The image is white background, black drawing.
+    # Invert first so the drawing is the "object" (white on black) for getbbox
+    inverted_image = PIL.ImageOps.invert(image)
+    bbox = inverted_image.getbbox()
 
-    img_arr = 255 - img_arr
-    img_arr = img_arr / 255.0
-    img_arr = img_arr.reshape(1, 28, 28, 1)
+    if bbox:
+        # 2. Crop the image to the contents (the digit)
+        img_cropped = inverted_image.crop(bbox)
 
-    prediction = model.predict(img_arr)
-    digit = np.argmax(prediction)
+        # 3. Create a new 28x28 blank (black) image
+        # MNIST requires the digit to be centered in a 28x28 box
+        new_img = Image.new("L", (28, 28), 0)  # 0 = Black background
 
-    result_label.config(text=f"Predicted Digit: {digit}")
+        # 4. Resize the cropped digit to fit in a 20x20 box (keeping aspect ratio)
+        # This leaves 4px padding on all sides, matching MNIST dataset style
+        img_cropped.thumbnail((20, 20), Image.Resampling.LANCZOS)
+
+        # 5. Paste the resized digit into the center of the 28x28 canvas
+        w, h = img_cropped.size
+        x_offset = (28 - w) // 2
+        y_offset = (28 - h) // 2
+        new_img.paste(img_cropped, (x_offset, y_offset))
+
+        # 6. Prepare for Model
+        img_arr = np.array(new_img)
+        img_arr = img_arr / 255.0  # Normalize
+        img_arr = img_arr.reshape(1, 28, 28, 1)
+
+        # 7. Predict
+        prediction = model.predict(img_arr)
+        digit = np.argmax(prediction)
+        confidence = np.max(prediction)
+
+        result_label.config(text=f"Predicted Digit: {digit} ({confidence:.2f})")
+    else:
+        result_label.config(text="Canvas is empty!")
 
 
 # ---------------------------------
