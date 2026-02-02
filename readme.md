@@ -26,33 +26,40 @@ This project implements a digit recognition model using machine learning techniq
 
 To set up the project, clone the repository and install the required dependencies:
 
-````bash
+```bash
 git clone https://github.com/Niranjan20061907/Digit-Recognition-model.git
 cd Digit-Recognition-model
 pip install -r requirements.txt
+```
 
-Usage
+## Usage
+
 To run the model, execute the following command:
 
 You can modify the parameters in config.py to customize the training process.
 
-Model Architecture
+## Model Architecture
+
 The model is built using a Convolutional Neural Network (CNN) architecture, which includes:
 
 Convolutional layers
 Pooling layers
 Fully connected layers
-Training
+
+## Training
+
 The model is trained on the MNIST dataset. You can find the dataset in the data/ directory. Training logs will be saved in the logs/ directory.
 
-Results
+## Results
+
 The model achieves an accuracy of over 98% on the test set. Detailed results can be found in the results/ directory.
 
-Contributing
+## Contributing
+
 Contributions are welcome! Please submit a pull request or open an issue for any suggestions or improvements.
 
-License
+## License
+
 This project is licensed under the MIT License. See the LICENSE file for more details.
 
-For any questions or feedback, please contact the project maintainer. ```
-````
+For any questions or feedback, please contact the project maintainer.
